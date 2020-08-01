@@ -27,9 +27,9 @@ import javax.inject.Singleton;
 import net.fhirfactory.pegacorn.common.model.FDN;
 import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.common.model.RDN;
-import net.fhirfactory.pegacorn.petasos.datasets.loader.model.DataSetMapElement;
-import net.fhirfactory.pegacorn.petasos.datasets.manager.DataSetsIM;
-import net.fhirfactory.pegacorn.petasos.model.dataset.DataSetElement;
+import net.fhirfactory.pegacorn.petasos.datasets.loader.model.TopicMapElement;
+import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
+import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,18 +38,18 @@ import org.slf4j.LoggerFactory;
  * @author Mark A. Hunter
  */
 @Singleton
-public class DataSetFileElementTransformer {
+public class TopicFileElementTransformer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataSetFileElementTransformer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopicFileElementTransformer.class);
 
     @Inject
-    DataSetsIM topicServer;
+    TopicIM topicServer;
 
-    public DataSetElement convertToTopicElement(DataSetMapElement incomingTopicDetail, FDNToken parentTopic) {
+    public Topic convertToTopicElement(TopicMapElement incomingTopicDetail, FDNToken parentTopic) {
         LOG.debug(".convertToTopicElement(): Entry, incomingTopicDetail --> {}, parentTopic --> {}", incomingTopicDetail, parentTopic);
-        DataSetElement newTopic = new DataSetElement();
+        Topic newTopic = new Topic();
         LOG.trace(".convertToTopicElement(): Adding the ContainingTopic to the new TopicElement, containing topic instance id --> {}", parentTopic);
-        newTopic.setContainingTopic(parentTopic);
+        newTopic.setContainingDataset(parentTopic);
         LOG.trace(".convertToTopicElement(): Adding the TopicID to the new TopicElement, instance name --> {}", incomingTopicDetail.getTopicName());
         FDN newTopicInstanceFDN;
         if (parentTopic == null) {
@@ -57,19 +57,19 @@ public class DataSetFileElementTransformer {
         } else {
             newTopicInstanceFDN = new FDN(parentTopic);
         }
-        newTopicInstanceFDN.appendRDN(new RDN(incomingTopicDetail.getTopicType().getTopicElementType(), incomingTopicDetail.getTopicName()));
-        newTopic.setTopicID(newTopicInstanceFDN.getToken());
+        newTopicInstanceFDN.appendRDN(new RDN(incomingTopicDetail.getTopicType().getTopicType(), incomingTopicDetail.getTopicName()));
+        newTopic.setIdentifier(newTopicInstanceFDN.getToken());
         LOG.trace(".convertToTopicElement(): Calling on Topics Manager to add Topic to Topic Cache, parentTopicInstanceID --> {}, newTopic --> {}", parentTopic, newTopic);
         topicServer.registerTopic(newTopic);
         LOG.trace(".convertToTopicElement(): Adding the contained Topic IDs to the Topic Element");
         if (!incomingTopicDetail.getContainedElements().isEmpty()) {
             LOG.trace(".convertToTopicElement(): Adding the contained Topic IDs, number to be addded --> {}", incomingTopicDetail.getContainedElements().size());
-            Iterator<DataSetMapElement> topicElementIterator = incomingTopicDetail.getContainedElements().iterator();
+            Iterator<TopicMapElement> topicElementIterator = incomingTopicDetail.getContainedElements().iterator();
             while (topicElementIterator.hasNext()) {
-                DataSetMapElement containedNode = topicElementIterator.next();
+                TopicMapElement containedNode = topicElementIterator.next();
                 LOG.trace("convertToTopicElement(): Adding the contained Node ID --> {}", containedNode.getTopicName());
                 FDN containedNodeFDN = new FDN(newTopicInstanceFDN);
-                containedNodeFDN.appendRDN(new RDN(containedNode.getTopicType().getTopicElementType(), containedNode.getTopicName()));
+                containedNodeFDN.appendRDN(new RDN(containedNode.getTopicType().getTopicType(), containedNode.getTopicName()));
                 newTopic.addContainedTopic(containedNodeFDN.getToken());
                 convertToTopicElement(containedNode, newTopicInstanceFDN.getToken());
             }

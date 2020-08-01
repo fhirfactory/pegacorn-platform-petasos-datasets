@@ -1,6 +1,6 @@
 package net.fhirfactory.pegacorn.petasos.topology.loader;
 
-import net.fhirfactory.pegacorn.petasos.datasets.loader.DataSetFileReader;
+import net.fhirfactory.pegacorn.petasos.datasets.loader.TopicFileReader;
 import org.jboss.arquillian.container.test.api.Deployment;
 
 import org.jboss.arquillian.junit.Arquillian;
@@ -34,7 +34,7 @@ public class TopologyFileReaderTest {
         }
 
         return ShrinkWrap.create(JavaArchive.class)
-                .addClass(DataSetFileReader.class)
+                .addClass(TopicFileReader.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 

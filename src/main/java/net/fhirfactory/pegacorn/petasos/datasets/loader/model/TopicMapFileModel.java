@@ -19,32 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.fhirfactory.pegacorn.petasos.datasets.manager;
+package net.fhirfactory.pegacorn.petasos.datasets.loader.model;
 
-import javax.inject.Inject;
-import net.fhirfactory.pegacorn.petasos.datasets.loader.DataSetFileReader;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Mark A. Hunter
  */
-public class DataSetsSynchronisationServer extends RouteBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DataSetsSynchronisationServer.class);
+public class TopicMapFileModel {
+        private List<TopicMapElement> topicSectors;
     
-    @Inject
-    DataSetFileReader initialLoader;
+    public TopicMapFileModel(){
+        topicSectors = new ArrayList<TopicMapElement>();
+    }
 
-    @Override
-    public void configure() throws Exception {
-        from("timer://TopologyServerTrigger?delay=2000&period=0")
-                .routeId("Topology Configuration File Loader")
-                .bean(initialLoader)
-                .end();
+    public List<TopicMapElement> getTopicSectors() {
+        return topicSectors;
+    }
+
+    public void setTopicSectors(List<TopicMapElement> topicSectors) {
+        this.topicSectors = topicSectors;
     }
 
 }

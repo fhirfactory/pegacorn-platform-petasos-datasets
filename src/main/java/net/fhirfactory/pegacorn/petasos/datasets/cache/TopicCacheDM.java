@@ -40,25 +40,25 @@ import javax.transaction.Transactional;
 
 import net.fhirfactory.pegacorn.common.model.FDN;
 import net.fhirfactory.pegacorn.common.model.RDN;
-import net.fhirfactory.pegacorn.petasos.model.dataset.DataSetElement;
+import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
+import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementInstanceTypeEnum;
 
-
 /**
- * 
+ *
  * @author Mark A. Hunter
  * @since 2020-07-01
- * 
+ *
  */
 @ApplicationScoped
-public class DataSetsDM {
+public class TopicCacheDM {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataSetsDM.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TopicCacheDM.class);
 
-    private ConcurrentHashMap<FDNToken, DataSetElement> dataSetCache;
+    private ConcurrentHashMap<TopicToken, Topic> dataSetCache;
 
-    public DataSetsDM() {
-        this.dataSetCache = new ConcurrentHashMap<FDNToken, DataSetElement>();
+    public TopicCacheDM() {
+        this.dataSetCache = new ConcurrentHashMap<TopicToken, Topic>();
     }
 
     /**
@@ -70,29 +70,31 @@ public class DataSetsDM {
      * @param newElement The NodeElement to be added to the Set
      */
     @Transactional
-    public void addTopic(DataSetElement newElement) {
-        LOG.debug(".addTopic(): Entry, newElement --> {}", newElement);
-        if (newElement == null) {
-            throw (new IllegalArgumentException(".addTopic(): newElement is null"));
+    public void addTopic(Topic newTopic) {
+        LOG.debug(".addTopic(): Entry, newTopic (TopicToken) --> {}", newTopic);
+        if (newTopic == null) {
+            throw (new IllegalArgumentException(".addTopic(): newTopic is null"));
         }
-        if (!newElement.hasTopicID()) {
-            throw (new IllegalArgumentException(".addTopic(): bad elementID within newElement"));
+        if (!newTopic.hasIdentifier()) {
+            throw (new IllegalArgumentException(".addTopic(): bad Identifier within newTopic"));
         }
-        if (this.dataSetCache.containsKey(newElement.getTopicID())) {
-            this.dataSetCache.replace(newElement.getTopicID(), newElement);
+        TopicToken newToken = newTopic.getTopicToken();
+        if (this.dataSetCache.containsKey(newToken)) {
+            this.dataSetCache.replace(newToken, newTopic);
         } else {
-            this.dataSetCache.put(newElement.getTopicID(), newElement);
+            this.dataSetCache.put(newToken, newTopic);
         }
     }
 
     /**
-     * 
+     *
      * @param elementID the Topic to be removed
-     * 
-     * TODO Robustness issue - Need to address the scenario where the topic has contained topics
+     *
+     * TODO Robustness issue - Need to address the scenario where the topic has
+     * contained topics
      */
     @Transactional
-    public void removeTopic(FDNToken elementID) {
+    public void removeTopic(TopicToken elementID) {
         LOG.debug(".removeTopic(): Entry, elementID --> {}", elementID);
         if (elementID == null) {
             throw (new IllegalArgumentException(".removeNode(): elementID is null"));
@@ -106,9 +108,9 @@ public class DataSetsDM {
         LOG.debug(".removeTopic(): Exit");
     }
 
-    public Set<DataSetElement> getTopicSet() {
+    public Set<Topic> getTopicSet() {
         LOG.debug(".getTopicSet(): Entry");
-        LinkedHashSet<DataSetElement> elementSet = new LinkedHashSet<DataSetElement>();
+        LinkedHashSet<Topic> elementSet = new LinkedHashSet<Topic>();
         if (this.dataSetCache.isEmpty()) {
             LOG.debug(".getTopicSet(): Exit, The topic map is empty, returning null");
             return (null);
@@ -120,7 +122,7 @@ public class DataSetsDM {
         return (elementSet);
     }
 
-    public DataSetElement getTopic(FDNToken topicID) {
+    public Topic getTopic(FDNToken topicID) {
         LOG.debug(".getTopic(): Entry, nodeID --> {}", topicID);
         if (topicID == null) {
             LOG.debug(".getTopic(): Exit, provided a null nodeID , so returning null");
@@ -128,7 +130,7 @@ public class DataSetsDM {
         }
         if (this.dataSetCache.containsKey(topicID)) {
             LOG.trace(".getTopic(): Element found!!! WooHoo!");
-            DataSetElement retrievedElement = this.dataSetCache.get(topicID);
+            Topic retrievedElement = this.dataSetCache.get(topicID);
             LOG.debug(".getTopic(): Exit, returning element --> {}", retrievedElement);
             return (retrievedElement);
         } else {
@@ -138,9 +140,9 @@ public class DataSetsDM {
         }
     }
 
-    public Map<Integer, DataSetElement> getTopicContainmentHierarchy(FDNToken topicID) {
+    public Map<Integer, Topic> getTopicContainmentHierarchy(FDNToken topicID) {
         LOG.debug(".getTopicContainmentHierarchy(): Entry, nodeID --> {}", topicID);
-        HashMap<Integer, DataSetElement> topicHierarchy = new HashMap<Integer, DataSetElement>();
+        HashMap<Integer, Topic> topicHierarchy = new HashMap<Integer, Topic>();
         if (topicID == null) {
             return (topicHierarchy);
         }
@@ -148,22 +150,22 @@ public class DataSetsDM {
         int counter = 0;
         FDNToken currentTopic = topicID;
         while (hasContainer) {
-            DataSetElement currentElement = dataSetCache.get(currentTopic);
+            Topic currentElement = dataSetCache.get(currentTopic);
             if (currentElement == null) {
                 hasContainer = false;
             } else {
                 topicHierarchy.put(counter, currentElement);
                 counter++;
-                if (!currentElement.hasContainingTopic()) {
+                if (!currentElement.hasContainingDataset()) {
                     hasContainer = false;
                 } else {
-                    currentTopic = currentElement.getContainingTopic();
+                    currentTopic = currentElement.getContainingDataset();
                 }
             }
         }
-        if(LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug(".getTopicContainmentHierarchy(): Exit, retrieved Heirarchy, depth --> {}", topicHierarchy.size());
         }
-        return(topicHierarchy);
+        return (topicHierarchy);
     }
 }

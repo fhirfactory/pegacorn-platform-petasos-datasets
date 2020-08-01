@@ -23,7 +23,7 @@ package net.fhirfactory.pegacorn.petasos.datasets.loader.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.fhirfactory.pegacorn.petasos.model.dataset.DataSetTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.topics.TopicTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
@@ -35,22 +35,22 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mark A. Hunter
  */
-public class DataSetMapElement {
+public class TopicMapElement {
         private static final Logger LOG = LoggerFactory.getLogger(NodeElement.class);
 
-    private DataSetTypeEnum topicType;
+    private TopicTypeEnum topicType;
     private String topicName;
-    private List<DataSetMapElement> containedElements;
+    private List<TopicMapElement> containedElements;
     
-    public DataSetMapElement(){
-        containedElements = new ArrayList<DataSetMapElement>();
+    public TopicMapElement(){
+        containedElements = new ArrayList<TopicMapElement>();
     }
 
-    public DataSetTypeEnum getTopicType() {
+    public TopicTypeEnum getTopicType() {
         return topicType;
     }
 
-    public void setTopicType(DataSetTypeEnum topicType) {
+    public void setTopicType(TopicTypeEnum topicType) {
         this.topicType = topicType;
     }
 
@@ -62,11 +62,11 @@ public class DataSetMapElement {
         this.topicName = topicName;
     }
 
-    public List<DataSetMapElement> getContainedElements() {
+    public List<TopicMapElement> getContainedElements() {
         return containedElements;
     }
 
-    public void setContainedElements(List<DataSetMapElement> containedElements) {
+    public void setContainedElements(List<TopicMapElement> containedElements) {
         this.containedElements = containedElements;
     }
 }
