@@ -22,6 +22,7 @@
 
 package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
+import ca.uhn.fhir.rest.annotation.Transaction;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -50,20 +51,18 @@ public class TopicSubscriptionMapDM {
      * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-
-    public FDNTokenSet getSubscriptionSetForUOWContentTopic(FDNToken topicID){
-    	LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, topicID --> {}", topicID);
+     public FDNTokenSet getSubscriberSet(TopicToken topicID){
+    	LOG.debug(".getSubscriberSet(): Entry, topicID --> {}", topicID);
     	if(distributionList.isEmpty()) {
-    		LOG.debug("getSubscriptionSetForUOWContentTopic(): Exit, empty list so can't match");
-    		
+    		LOG.debug("getSubscriberSet(): Exit, empty list so can't match");
     		return(null);
     	}
     	if(this.distributionList.containsKey(topicID)) {
     		FDNTokenSet interestedWUPSet = this.distributionList.get(topicID);
-    		LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit, returning associated FDNSet of the WUPs interested --> {}", interestedWUPSet);
+    		LOG.debug(".getSubscriberSet(): Exit, returning associated FDNSet of the WUPs interested --> {}", interestedWUPSet);
     		return(interestedWUPSet);
     	}
-    	LOG.debug(".getSubscriptionSetForUOWContentTopic(): Couldn't find any associated FDNTokenSet elements (i.e. couldn't find any interested WUPs, returning null");
+    	LOG.debug(".getSubscriberSet(): Couldn't find any associated FDNTokenSet elements (i.e. couldn't find any interested WUPs, returning null");
     	return(null);
     }
     
@@ -71,24 +70,47 @@ public class TopicSubscriptionMapDM {
      * This function establishes a link between a Payload Type and a WUP that is interested in
      * processing/using it.
      * 
-     * @param contentTopicID The contentTopicID (FDNToken) of the payload we have received from a WUP
-     * @param interestedWUP The ID of the WUP that is interested in the payload type.
+     * @param topic The contentTopicID (FDNToken) of the payload we have received from a WUP
+     * @param subscriberInstanceID The ID of the WUP that is interested in the payload type.
      */
-    public void addSubscriberToUoWContentTopic(TopicToken topic, FDNToken interestedWUP) {
-    	LOG.debug(".addInterestedWUPforPayload(): Entry, topic --> {}, interestedWUP --> {}", topic, interestedWUP);
-    	if((topic==null) || (interestedWUP==null)) {
-    		throw(new IllegalArgumentException(".setRouteForPayload(): contentTopicID or interestedWUP is null"));
+    @Transaction
+    public void addSubscriber(TopicToken topic, FDNToken subscriberInstanceID) {
+    	LOG.debug(".addSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberInstanceID);
+    	if((topic==null) || (subscriberInstanceID==null)) {
+    		throw(new IllegalArgumentException(".addSubscriber(): topic or subscriberInstanceID is null"));
     	}
     	if(this.distributionList.containsKey(topic)) {
-    		LOG.trace(".addInterestedWUPforPayload(): Removing existing map for contentTopicID --> {}", topic);
+    		LOG.trace(".addSubscriber(): Removing existing map for topic --> {}", topic);
     		FDNTokenSet payloadDistributionList = this.distributionList.get(topic);
-    		payloadDistributionList.addElement(interestedWUP);
+    		payloadDistributionList.addElement(subscriberInstanceID);
     	} else {
     		FDNTokenSet newPayloadDistributionList = new FDNTokenSet();
-    		newPayloadDistributionList.addElement(interestedWUP);
+    		newPayloadDistributionList.addElement(subscriberInstanceID);
     		this.distributionList.put(topic, newPayloadDistributionList);
     	}
-    	LOG.debug(".addInterestedWUPforPayload(): Exit, assigned the interestedWUP to the contentTopicID");
+    	LOG.debug(".addSubscriber(): Exit, assigned the interestedWUP to the contentTopicID");
+    }
+    
+    /**
+     * Remove a Subscriber from the Topic Subscription list
+     * 
+     * @param topic The TopicToken of the Topic we want to unsubscribe from.
+     * @param subscriberInstanceID  The subscriber we are removing from the subscription list.
+     */
+    @Transaction
+    public void removeSubscriber(TopicToken topic, FDNToken subscriberInstanceID) {
+    	LOG.debug(".removeSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberInstanceID);
+    	if((topic==null) || (subscriberInstanceID==null)) {
+    		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
+    	}
+    	if(this.distributionList.containsKey(topic)) {
+    		LOG.trace(".removeSubscriber(): Removing existing map for topic --> {}", topic);
+    		FDNTokenSet payloadDistributionList = this.distributionList.get(topic);
+    		payloadDistributionList.removeElement(subscriberInstanceID);
+    	} else {
+    		LOG.trace(".removeSubscriber(): Not such Topic in the Cache for topic --> {}", topic);
+    	}
+    	LOG.debug(".removeSubscriber(): Exit, removed the subscriberInstanceID from the topic");
     }
 
 }

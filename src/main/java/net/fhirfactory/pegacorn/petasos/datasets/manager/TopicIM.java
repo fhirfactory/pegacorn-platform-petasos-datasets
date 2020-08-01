@@ -45,7 +45,7 @@ public class TopicIM {
     private static final Logger LOG = LoggerFactory.getLogger(TopicIM.class);
 
     @Inject
-    TopicCacheDM dataSetCache;
+    TopicCacheDM topicSetCache;
 
     @Inject
     TopicSubscriptionMapDM subscriptionCache;
@@ -53,7 +53,7 @@ public class TopicIM {
     @Transactional
     public void registerTopic(Topic newElement) {
         LOG.debug(".registerTopic(): Entry, newElement --> {}", newElement);
-        dataSetCache.addTopic(newElement);
+        topicSetCache.addTopic(newElement);
         if (newElement.hasContainingDataset()) {
             addContainedTopicToTopic(newElement.getContainingDataset(), newElement);
         }
@@ -74,17 +74,17 @@ public class TopicIM {
     @Transactional
     public void unregisterTopic(TopicToken elementID) {
         LOG.debug(".unregisterTopic(): Entry, elementID --> {}", elementID);
-        dataSetCache.removeTopic(elementID);
+        topicSetCache.removeTopic(elementID);
     }
 
     public Set<Topic> getTopicSet() {
         LOG.debug(".getTopicSet(): Entry");
-        return (dataSetCache.getTopicSet());
+        return (topicSetCache.getTopicSet());
     }
 
     public Topic getTopic(FDNToken nodeID) {
         LOG.debug(".getTopic(): Entry, nodeID --> {}", nodeID);
-        Topic retrievedTopic = dataSetCache.getTopic(nodeID);
+        Topic retrievedTopic = topicSetCache.getTopic(nodeID);
         LOG.debug(".getTopic(): Exit, retrievedNode --> {}", retrievedTopic);
         return (retrievedTopic);
     }
@@ -97,9 +97,9 @@ public class TopicIM {
      * that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-    public FDNTokenSet getSubscriptionSetForUOWContentTopic(FDNToken topicID) {
+    public FDNTokenSet getSubscriberSet(TopicToken topicID) {
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, topicID --> {}", topicID);
-        FDNTokenSet subscribedTopicSet = subscriptionCache.getSubscriptionSetForUOWContentTopic(topicID);
+        FDNTokenSet subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -112,10 +112,16 @@ public class TopicIM {
      * @param interestedNode The ID of the (Topology) Node that is interested in the payload type.
      */
     @Transactional
-    public void addSubscriberToUoWContentTopic(TopicToken contentTopicID, FDNToken interestedNode) {
+    public void addTopicSubscriber(TopicToken contentTopicID, FDNToken interestedNode) {
         LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
-        subscriptionCache.addSubscriberToUoWContentTopic(contentTopicID, interestedNode);
+        subscriptionCache.addSubscriber(contentTopicID, interestedNode);
         LOG.debug(".addSubscriberToUoWContentTopic(): Exit");
     }
-   
+
+    @Transactional
+    public void removeSubscriber(TopicToken contentTopicID, FDNToken interestedNode) {
+        LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
+        subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
+        LOG.debug(".removeSubscriber(): Exit");
+    }
 }
