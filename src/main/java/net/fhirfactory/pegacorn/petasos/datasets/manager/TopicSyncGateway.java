@@ -36,14 +36,11 @@ public class TopicSyncGateway extends RouteBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopicSyncGateway.class);
     
-    @Inject
-    TopicFileReader initialLoader;
-
     @Override
     public void configure() throws Exception {
         from("timer://TopologyServerTrigger?delay=2000&period=0")
                 .routeId("Topology Configuration File Loader")
-                .bean(initialLoader)
+                .bean(TopicFileReader.class,"readFile")
                 .end();
     }
 

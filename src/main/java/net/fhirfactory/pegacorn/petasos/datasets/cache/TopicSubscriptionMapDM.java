@@ -24,6 +24,7 @@ package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
 import ca.uhn.fhir.rest.annotation.Transaction;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ import net.fhirfactory.pegacorn.common.model.FDNTokenSet;
 import javax.inject.Singleton;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 
-@Singleton
+@ApplicationScoped
 public class TopicSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(TopicSubscriptionMapDM.class);
 	
@@ -46,7 +47,7 @@ public class TopicSubscriptionMapDM {
 
     /**
      * This function retrieves the list (FDNTokenSet) of WUPs that are interested in 
-     * receiving the identified uowPayloadTopicID (FDNToken).
+ receiving the identified uowPayloadTopicID (FDNToken).
      * 
      * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.

@@ -29,18 +29,18 @@ import java.util.List;
  * @author Mark A. Hunter
  */
 public class TopicMapFileModel {
-        private List<TopicMapElement> topicSectors;
-    
-    public TopicMapFileModel(){
-        topicSectors = new ArrayList<TopicMapElement>();
-    }
+	private List<TopicMapElement> topicSectors;
 
-    public List<TopicMapElement> getTopicSectors() {
-        return topicSectors;
-    }
+	public TopicMapFileModel() {
+		topicSectors = new ArrayList<TopicMapElement>();
+	}
 
-    public void setTopicSectors(List<TopicMapElement> topicSectors) {
-        this.topicSectors = topicSectors;
-    }
+	public List<TopicMapElement> getTopicSectors() {
+		return topicSectors;
+	}
+
+	public void setTopicSectors(List<TopicMapElement> topicSectors) {
+		this.topicSectors = topicSectors;
+	}
 
 }

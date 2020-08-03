@@ -41,7 +41,7 @@ public class TopicFileReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopicFileReader.class);
 
-    private static String fileName = "/TopicsFile.json";
+    private static String fileName = "/META-INF/TopicsFile.json";
     
     @Inject
     TopicFileElementTransformer transformer;
@@ -53,7 +53,7 @@ public class TopicFileReader {
         ObjectMapper objectMapper = new ObjectMapper();
         LOG.trace(".readFile(): Create the URL for the Topics File (it should be within the WAR), filename --> {}", fileName );
         URL fileURL = getClass().getResource(fileName);
-        LOG.trace(".readFile(): URL created, content --> {}", fileURL.toString());
+        LOG.trace(".readFile(): URL created, content --> {}", fileURL);
         TopicMapFileModel topicFileContent = null;
         try {
             LOG.trace(".readFile(): Open the file as an InputStream");

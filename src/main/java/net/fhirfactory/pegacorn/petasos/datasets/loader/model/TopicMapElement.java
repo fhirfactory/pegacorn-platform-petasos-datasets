@@ -27,7 +27,7 @@ import net.fhirfactory.pegacorn.petasos.model.topics.TopicTypeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ConcurrencyModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.resilience.mode.ResilienceModeEnum;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementInstanceTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,7 @@ public class TopicMapElement {
     private TopicTypeEnum topicType;
     private String topicName;
     private List<TopicMapElement> containedElements;
+    private String version;
     
     public TopicMapElement(){
         containedElements = new ArrayList<TopicMapElement>();
@@ -68,5 +69,13 @@ public class TopicMapElement {
 
     public void setContainedElements(List<TopicMapElement> containedElements) {
         this.containedElements = containedElements;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

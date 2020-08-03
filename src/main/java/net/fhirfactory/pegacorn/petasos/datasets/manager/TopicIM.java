@@ -91,10 +91,10 @@ public class TopicIM {
 
     /**
      * This function retrieves the list (FDNTokenSet) of WUPs that are
-     * interested in receiving the identified uowPayloadTopicID (FDNToken).
+ interested in receiving the identified uowPayloadTopicID (FDNToken).
      *
      * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic
-     * that we want to know which WUPs are interested in
+ that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
     public FDNTokenSet getSubscriberSet(TopicToken topicID) {

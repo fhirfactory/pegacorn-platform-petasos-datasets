@@ -42,7 +42,7 @@ import net.fhirfactory.pegacorn.common.model.FDN;
 import net.fhirfactory.pegacorn.common.model.RDN;
 import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
 import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementInstanceTypeEnum;
+import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementTypeEnum;
 
 /**
  *
@@ -64,8 +64,8 @@ public class TopicCacheDM {
     /**
      * This function adds an entry to the Element Set.
      * <p>
-     * Note that the default behaviour is to UPDATE the values with the set if
-     * there already exists an instance for the specified FDNToken (identifier).
+ Note that the default behaviour is to UPDATE the values with the set if
+ there already exists an instance for the specified FDNToken (identifier).
      *
      * @param newElement The NodeElement to be added to the Set
      */

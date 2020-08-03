@@ -22,6 +22,7 @@
 package net.fhirfactory.pegacorn.petasos.datasets.loader;
 
 import java.util.Iterator;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.fhirfactory.pegacorn.common.model.FDN;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mark A. Hunter
  */
-@Singleton
+@ApplicationScoped
 public class TopicFileElementTransformer {
 
     private static final Logger LOG = LoggerFactory.getLogger(TopicFileElementTransformer.class);
