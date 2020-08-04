@@ -23,9 +23,15 @@
 package net.fhirfactory.pegacorn.petasos.datasets.cache;
 
 import ca.uhn.fhir.rest.annotation.Transaction;
+
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 
+import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +45,10 @@ import net.fhirfactory.pegacorn.petasos.model.topics.TopicToken;
 public class TopicSubscriptionMapDM {
 	private static final Logger LOG = LoggerFactory.getLogger(TopicSubscriptionMapDM.class);
 	
-	ConcurrentHashMap<TopicToken, FDNTokenSet> distributionList;
+	ConcurrentHashMap<TopicToken, Set<NodeElement>> distributionList;
 	
     public TopicSubscriptionMapDM(){
-        distributionList = new ConcurrentHashMap<TopicToken, FDNTokenSet>();
+        distributionList = new ConcurrentHashMap<TopicToken, Set<NodeElement>>();
     }
 
     /**
@@ -52,14 +58,25 @@ public class TopicSubscriptionMapDM {
      * @param topicID The FDNToken representing the UoW (Ingres) Payload Topic that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-     public FDNTokenSet getSubscriberSet(TopicToken topicID){
+     public Set<NodeElement> getSubscriberSet(TopicToken topicID){
     	LOG.debug(".getSubscriberSet(): Entry, topicID --> {}", topicID);
     	if(distributionList.isEmpty()) {
     		LOG.debug("getSubscriberSet(): Exit, empty list so can't match");
     		return(null);
     	}
-    	if(this.distributionList.containsKey(topicID)) {
-    		FDNTokenSet interestedWUPSet = this.distributionList.get(topicID);
+    	boolean found = false;
+    	TopicToken currentToken = null;
+		Enumeration<TopicToken> topicEnumerator = distributionList.keys();
+		while(topicEnumerator.hasMoreElements()){
+			currentToken = topicEnumerator.nextElement();
+			if(currentToken.equals(topicID)){
+				LOG.trace(".getSubscriberSet(): Found Topic in Subscription Cache");
+				found = true;
+				break;
+			}
+		}
+    	if(found) {
+    		Set<NodeElement> interestedWUPSet = this.distributionList.get(currentToken);
     		LOG.debug(".getSubscriberSet(): Exit, returning associated FDNSet of the WUPs interested --> {}", interestedWUPSet);
     		return(interestedWUPSet);
     	}
@@ -72,21 +89,32 @@ public class TopicSubscriptionMapDM {
      * processing/using it.
      * 
      * @param topic The contentTopicID (FDNToken) of the payload we have received from a WUP
-     * @param subscriberInstanceID The ID of the WUP that is interested in the payload type.
+     * @param subscriberNode The NodeElement of the WUP that is interested in the payload type.
      */
     @Transaction
-    public void addSubscriber(TopicToken topic, FDNToken subscriberInstanceID) {
-    	LOG.debug(".addSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberInstanceID);
-    	if((topic==null) || (subscriberInstanceID==null)) {
+    public void addSubscriber(TopicToken topic, NodeElement subscriberNode) {
+    	LOG.debug(".addSubscriber(): Entry, topic --> {}, subscriberInstanceID --> {}", topic, subscriberNode);
+    	if((topic==null) || (subscriberNode==null)) {
     		throw(new IllegalArgumentException(".addSubscriber(): topic or subscriberInstanceID is null"));
     	}
-    	if(this.distributionList.containsKey(topic)) {
+		boolean found = false;
+		TopicToken currentToken = null;
+		Enumeration<TopicToken> topicEnumerator = distributionList.keys();
+		while(topicEnumerator.hasMoreElements()){
+			currentToken = topicEnumerator.nextElement();
+			if(currentToken.equals(topic)){
+				LOG.trace(".addSubscriber(): Found Topic in Subscription Cache");
+				found = true;
+				break;
+			}
+		}
+		if(found) {
     		LOG.trace(".addSubscriber(): Removing existing map for topic --> {}", topic);
-    		FDNTokenSet payloadDistributionList = this.distributionList.get(topic);
-    		payloadDistributionList.addElement(subscriberInstanceID);
+			Set<NodeElement> payloadDistributionList = this.distributionList.get(currentToken);
+    		payloadDistributionList.add(subscriberNode);
     	} else {
-    		FDNTokenSet newPayloadDistributionList = new FDNTokenSet();
-    		newPayloadDistributionList.addElement(subscriberInstanceID);
+			Set<NodeElement>  newPayloadDistributionList = new LinkedHashSet<NodeElement> ();
+    		newPayloadDistributionList.add(subscriberNode);
     		this.distributionList.put(topic, newPayloadDistributionList);
     	}
     	LOG.debug(".addSubscriber(): Exit, assigned the interestedWUP to the contentTopicID");
@@ -104,14 +132,35 @@ public class TopicSubscriptionMapDM {
     	if((topic==null) || (subscriberInstanceID==null)) {
     		throw(new IllegalArgumentException(".removeSubscriber(): topic or subscriberInstanceID is null"));
     	}
-    	if(this.distributionList.containsKey(topic)) {
-    		LOG.trace(".removeSubscriber(): Removing existing map for topic --> {}", topic);
-    		FDNTokenSet payloadDistributionList = this.distributionList.get(topic);
-    		payloadDistributionList.removeElement(subscriberInstanceID);
+		boolean found = false;
+		TopicToken currentToken = null;
+		Enumeration<TopicToken> topicEnumerator = distributionList.keys();
+		while(topicEnumerator.hasMoreElements()){
+			currentToken = topicEnumerator.nextElement();
+			if(currentToken.equals(topic)){
+				LOG.trace(".removeSubscriber(): Found Topic in Subscription Cache");
+				found = true;
+				break;
+			}
+		}
+		if(found) {
+    		LOG.trace(".removeSubscriber(): Removing Subscriber from topic --> {}", topic);
+			Set<NodeElement> payloadDistributionList = this.distributionList.get(currentToken);
+			Iterator<NodeElement> nodeIterator = payloadDistributionList.iterator();
+			while(nodeIterator.hasNext()){
+				NodeElement currentNode = nodeIterator.next();
+				if(currentNode.getNodeInstanceID().equals(subscriberInstanceID)){
+					LOG.trace(".removeSubscriber(): Found Subscriber in Subscription List, removing");
+					payloadDistributionList.remove(currentNode);
+					LOG.debug(".removeSubscriber(): Exit, removed the subscriberInstanceID from the topic");
+					break;
+				}
+			}
     	} else {
-    		LOG.trace(".removeSubscriber(): Not such Topic in the Cache for topic --> {}", topic);
+    		LOG.debug(".removeSubscriber(): Exit, Could not find Subscriber in Subscriber Cache for Topic");
+    		return;
     	}
-    	LOG.debug(".removeSubscriber(): Exit, removed the subscriberInstanceID from the topic");
+		LOG.debug(".removeSubscriber(): Exit, Could not find Topic in Subscriber Cache");
     }
 
 }

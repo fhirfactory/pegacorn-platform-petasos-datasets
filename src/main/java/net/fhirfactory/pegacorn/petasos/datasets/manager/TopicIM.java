@@ -23,6 +23,7 @@ package net.fhirfactory.pegacorn.petasos.datasets.manager;
 
 import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.TopicCacheDM;
+import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,9 +98,9 @@ public class TopicIM {
  that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-    public FDNTokenSet getSubscriberSet(TopicToken topicID) {
+    public Set<NodeElement> getSubscriberSet(TopicToken topicID) {
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, topicID --> {}", topicID);
-        FDNTokenSet subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
+        Set<NodeElement> subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -112,7 +113,7 @@ public class TopicIM {
      * @param interestedNode The ID of the (Topology) Node that is interested in the payload type.
      */
     @Transactional
-    public void addTopicSubscriber(TopicToken contentTopicID, FDNToken interestedNode) {
+    public void addTopicSubscriber(TopicToken contentTopicID, NodeElement interestedNode) {
         LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.addSubscriber(contentTopicID, interestedNode);
         LOG.debug(".addSubscriberToUoWContentTopic(): Exit");
