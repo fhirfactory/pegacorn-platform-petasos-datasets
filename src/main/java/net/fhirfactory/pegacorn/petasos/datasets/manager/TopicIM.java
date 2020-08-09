@@ -24,9 +24,11 @@ package net.fhirfactory.pegacorn.petasos.datasets.manager;
 import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.petasos.datasets.cache.TopicCacheDM;
 import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
+import net.fhirfactory.pegacorn.petasos.model.topology.NodeElementIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
@@ -50,6 +52,13 @@ public class TopicIM {
 
     @Inject
     TopicSubscriptionMapDM subscriptionCache;
+
+    @Inject
+    TopicSyncrhonisationServer topicSynchServer;
+
+    public void initialiseServices(){
+        topicSynchServer.initialiseServices();
+    }
 
     @Transactional
     public void registerTopic(Topic newElement) {
@@ -98,9 +107,9 @@ public class TopicIM {
  that we want to know which WUPs are interested in
      * @return The set of WUPs wanting to receive this payload type.
      */
-    public Set<NodeElement> getSubscriberSet(TopicToken topicID) {
+    public Set<NodeElementIdentifier> getSubscriberSet(TopicToken topicID) {
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Entry, topicID --> {}", topicID);
-        Set<NodeElement> subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
+        Set<NodeElementIdentifier> subscribedTopicSet = subscriptionCache.getSubscriberSet(topicID);
         LOG.debug(".getSubscriptionSetForUOWContentTopic(): Exit");
         return (subscribedTopicSet);
     }
@@ -113,14 +122,14 @@ public class TopicIM {
      * @param interestedNode The ID of the (Topology) Node that is interested in the payload type.
      */
     @Transactional
-    public void addTopicSubscriber(TopicToken contentTopicID, NodeElement interestedNode) {
+    public void addTopicSubscriber(TopicToken contentTopicID, NodeElementIdentifier interestedNode) {
         LOG.debug(".addSubscriberToUoWContentTopic(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.addSubscriber(contentTopicID, interestedNode);
         LOG.debug(".addSubscriberToUoWContentTopic(): Exit");
     }
 
     @Transactional
-    public void removeSubscriber(TopicToken contentTopicID, FDNToken interestedNode) {
+    public void removeSubscriber(TopicToken contentTopicID, NodeElementIdentifier interestedNode) {
         LOG.debug(".removeSubscriber(): Entry, contentTopicID --> {}, interestedNode --> {}", contentTopicID, interestedNode);
         subscriptionCache.removeSubscriber(contentTopicID, interestedNode);
         LOG.debug(".removeSubscriber(): Exit");

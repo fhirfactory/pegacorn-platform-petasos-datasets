@@ -67,7 +67,7 @@ public class TopicCacheDM {
  Note that the default behaviour is to UPDATE the values with the set if
  there already exists an instance for the specified FDNToken (identifier).
      *
-     * @param newElement The NodeElement to be added to the Set
+     * @param newTopic The NodeElement to be added to the Set
      */
     @Transactional
     public void addTopic(Topic newTopic) {

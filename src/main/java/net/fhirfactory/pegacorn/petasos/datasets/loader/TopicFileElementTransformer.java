@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import net.fhirfactory.pegacorn.common.model.FDN;
 import net.fhirfactory.pegacorn.common.model.FDNToken;
 import net.fhirfactory.pegacorn.common.model.RDN;
+import net.fhirfactory.pegacorn.petasos.datasets.cache.TopicCacheDM;
 import net.fhirfactory.pegacorn.petasos.datasets.loader.model.TopicMapElement;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
 import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
@@ -44,7 +45,7 @@ public class TopicFileElementTransformer {
     private static final Logger LOG = LoggerFactory.getLogger(TopicFileElementTransformer.class);
 
     @Inject
-    TopicIM topicServer;
+    TopicCacheDM topicCache;
 
     public Topic convertToTopicElement(TopicMapElement incomingTopicDetail, FDNToken parentTopic) {
         LOG.debug(".convertToTopicElement(): Entry, incomingTopicDetail --> {}, parentTopic --> {}", incomingTopicDetail, parentTopic);
@@ -61,7 +62,7 @@ public class TopicFileElementTransformer {
         newTopicInstanceFDN.appendRDN(new RDN(incomingTopicDetail.getTopicType().getTopicType(), incomingTopicDetail.getTopicName()));
         newTopic.setIdentifier(newTopicInstanceFDN.getToken());
         LOG.trace(".convertToTopicElement(): Calling on Topics Manager to add Topic to Topic Cache, parentTopicInstanceID --> {}, newTopic --> {}", parentTopic, newTopic);
-        topicServer.registerTopic(newTopic);
+        topicCache.addTopic(newTopic);
         LOG.trace(".convertToTopicElement(): Adding the contained Topic IDs to the Topic Element");
         if (!incomingTopicDetail.getContainedElements().isEmpty()) {
             LOG.trace(".convertToTopicElement(): Adding the contained Topic IDs, number to be addded --> {}", incomingTopicDetail.getContainedElements().size());

@@ -78,4 +78,14 @@ public class TopicMapElement {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "TopicMapElement{" +
+                "topicType=" + topicType +
+                ", topicName='" + topicName + '\'' +
+                ", containedElements=" + containedElements +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

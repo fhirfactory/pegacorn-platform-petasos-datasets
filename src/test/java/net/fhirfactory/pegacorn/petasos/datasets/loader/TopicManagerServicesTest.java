@@ -1,13 +1,10 @@
 package net.fhirfactory.pegacorn.petasos.datasets.loader;
 
-import net.fhirfactory.pegacorn.petasos.datasets.loader.TopicFileReader;
 import org.jboss.arquillian.container.test.api.Deployment;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,11 +18,8 @@ import java.util.Set;
 import net.fhirfactory.pegacorn.common.model.FDN;
 import net.fhirfactory.pegacorn.petasos.datasets.manager.TopicIM;
 import net.fhirfactory.pegacorn.petasos.model.topics.Topic;
-import net.fhirfactory.pegacorn.petasos.model.topology.NodeElement;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Node;
-
-import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class TopicManagerServicesTest {
@@ -59,18 +53,13 @@ public class TopicManagerServicesTest {
         return (testWAR);
     }
 
-    @javax.inject.Inject
-    TopicFileReader topicFileLoader;
-    
+
     @javax.inject.Inject
     TopicIM topicServer;
 
     @Test
     public void testLoadingOfFile() {
         LOG.info(".testLoadingOfFile(): Info Test");
-
-        LOG.info(".testLoadingOfFile(): Executing FileReader Load");
-        topicFileLoader.readFile();
         LOG.info(".testLoadingOfFile(): Now showing content of the TopologyCache");
         Set<Topic> nodeSet = topicServer.getTopicSet();
         LOG.info(".testLoadingOfFile(): nodeSet Size --> {}", nodeSet.size());
