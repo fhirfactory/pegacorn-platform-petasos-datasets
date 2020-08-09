@@ -6,6 +6,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -48,14 +49,18 @@ public class TopicManagerServicesTest {
         Iterator<ArchivePath> contentPathSetIterator = contentPathSet.iterator();
         while (contentPathSetIterator.hasNext()) {
             ArchivePath currentPath = contentPathSetIterator.next();
-            LOG.info(".createDeployment(): testWare Entry Path --> {}", currentPath.get());
+            LOG.trace(".createDeployment(): testWare Entry Path --> {}", currentPath.get());
         }
         return (testWAR);
     }
 
-
     @javax.inject.Inject
     TopicIM topicServer;
+
+    @Before
+    public void servicesSetup(){
+        topicServer.initialiseServices();
+    }
 
     @Test
     public void testLoadingOfFile() {
