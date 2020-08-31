@@ -14,3 +14,10 @@ pegacorn-platform-petasos-datasets.iml
 .settings/org.eclipse.wst.validation.prefs
 .project
 .classpath
+.settings/org.eclipse.wst.validation.prefs
+.settings/org.eclipse.wst.common.project.facet.core.xml
+.settings/org.eclipse.wst.common.component
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.core.resources.prefs
+.project
+.classpath
