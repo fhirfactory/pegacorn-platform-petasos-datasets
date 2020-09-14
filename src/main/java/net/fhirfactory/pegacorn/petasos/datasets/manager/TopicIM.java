@@ -53,13 +53,6 @@ public class TopicIM {
     @Inject
     TopicSubscriptionMapDM subscriptionCache;
 
-    @Inject
-    TopicSyncrhonisationServer topicSynchServer;
-
-    public void initialiseServices(){
-        topicSynchServer.initialiseServices();
-    }
-
     @Transactional
     public void registerTopic(Topic newElement) {
         LOG.debug(".registerTopic(): Entry, newElement --> {}", newElement);
